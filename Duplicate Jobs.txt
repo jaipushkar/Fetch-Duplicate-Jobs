@@ -1,0 +1,14 @@
+WITH Ranked AS (
+    SELECT *,
+           DENSE_RANK() OVER (PARTITION BY zip ORDER BY Job_Number) AS Rank 
+    FROM Backup_Hyvee_03_27_2024
+),
+Duplicate AS (
+    SELECT zip 
+    FROM Ranked 
+    WHERE Rank > 1
+)
+SELECT DISTINCT R.zip, R.Job_Number, R.site, R.extra1, R.Rank 
+FROM Ranked R
+JOIN Duplicate Dupli ON R.zip = Dupli.zip 
+ORDER BY R.zip, R.Rank DESC;
